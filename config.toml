@@ -1,0 +1,12 @@
+# Configuration for satisfactory_serve_map
+
+# The base URL where your save files will be accessible
+# This URL will be used to construct the links to the Satisfactory Calculator
+# Example: "https://sf.example.com"
+base_url = ""
+
+# Directory containing save files
+save_dir = "saves"
+
+# Port to run the server on
+port = 7778
