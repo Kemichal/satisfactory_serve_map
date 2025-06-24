@@ -1,10 +1,3 @@
-/*
-cd /tank/iso/rust/satisfactory_serve_map/
-nix develop
-cargo run -- --save-dir /tank/containers/satisfactory/saved/server
-https://satisfactory-calculator.com/en/interactive-map?url=https://sf2.kemichal.com/map/Noobville
- */
-
 use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
