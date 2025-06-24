@@ -1,6 +1,4 @@
-# Development configuration
 config.dev.toml
-
-# Rust
 /target
 /saves
+/.direnv

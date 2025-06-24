@@ -1,37 +1,53 @@
 {
   inputs = {
-    naersk.url = "github:nix-community/naersk/master";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    utils.url = "github:numtide/flake-utils";
+    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    crane.url = "github:ipetkov/crane";
+    crane.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     {
       self,
+      flake-utils,
       nixpkgs,
-      utils,
-      naersk,
+      rust-overlay,
+      crane,
     }:
-    utils.lib.eachDefaultSystem (
+    flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        naersk-lib = pkgs.callPackage naersk { };
+        overlays = [ (import rust-overlay) ];
+        pkgs = import nixpkgs {
+          inherit system overlays;
+        };
+
+        craneLib = crane.mkLib pkgs;
+
+        satisfactoryServeMap = craneLib.buildPackage {
+          src = craneLib.cleanCargoSource (craneLib.path ./.);
+          buildInputs = with pkgs; [
+            openssl
+            pkg-config
+          ];
+        };
       in
       {
-        defaultPackage = naersk-lib.buildPackage ./.;
-        devShell =
+        packages.default = satisfactoryServeMap;
+
+        nixosModules.default = ./nixos/module.nix;
+
+        devShells.default =
           with pkgs;
           mkShell {
             buildInputs = [
-              cargo
-              rustc
-              rustfmt
-              pre-commit
-              rustPackages.clippy
+              openssl
+              pkg-config
+              rust-bin.stable.latest.default
             ];
-            RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
+
       }
     );
 }
